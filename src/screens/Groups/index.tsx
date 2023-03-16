@@ -9,10 +9,7 @@ import { ListEmpty } from "@components/ListEmpty";
 import { Button } from "@components/Button";
 
 export function Groups() {
-  const [groups, setGroups] = useState<string[]>([
-    "Galera do Ignite",
-    "Amigos",
-  ]);
+  const [groups, setGroups] = useState<string[]>([]);
 
   return (
     <Container>
@@ -22,11 +19,12 @@ export function Groups() {
       <FlatList
         data={groups}
         keyExtractor={(item) => item}
-        contentContainerStyle={groups.length === 0 && { flex: 1 }}
         renderItem={({ item }) => <GroupCard title={item} />}
         ListEmptyComponent={() => (
           <ListEmpty message="Que tal cadastrar a primeira turma?" />
         )}
+        contentContainerStyle={groups.length === 0 && { flex: 1 }}
+        showsVerticalScrollIndicator={false}
       />
 
       <Button title="Criar nova turma" />
