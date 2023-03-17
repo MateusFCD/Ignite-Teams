@@ -1,8 +1,9 @@
 import { StatusBar } from "react-native";
-import { Groups } from "@screens/Groups";
 
 import { ThemeProvider } from "styled-components/native";
 import theme from "./src/styles/theme";
+
+import { Routes } from "@routes/index";
 
 import {
   useFonts,
@@ -22,7 +23,7 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <Groups /> : <Loading />}
+      {fontsLoaded ? <Routes /> : <Loading />}
     </ThemeProvider>
   );
 }
