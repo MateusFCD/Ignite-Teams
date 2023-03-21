@@ -8,14 +8,31 @@ import { Highlight } from "@components/Highlight";
 import { Input } from "@components/Input";
 
 import { useNavigation } from "@react-navigation/native";
+import { groupCreate } from "@storage/group/groupCreate";
+import { AppError } from "@utils/AppError";
+import { Alert } from "react-native";
 
 export function NewGroup() {
   const navigation = useNavigation();
   const [group, setGroup] = useState("");
 
-  function handleNew() {
-    navigation.navigate("players", { group: group });
+  async function handleNew() {
+    try {
+      if (group.trim().length === 0) {
+        return Alert.alert("New Group", "Provide the name group to create");
+      }
+      await groupCreate(group);
+      navigation.navigate("players", { group: group });
+    } catch (error) {
+      if (error instanceof AppError) {
+        Alert.alert("New Group", error.message);
+      } else {
+        Alert.alert("New Group", "Impossible to create new group");
+        console.error(error);
+      }
+    }
   }
+
   return (
     <Container>
       <Header showBackButton />
