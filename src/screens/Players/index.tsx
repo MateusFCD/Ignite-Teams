@@ -1,4 +1,4 @@
-import { Alert } from "react-native/Libraries/Alert/Alert";
+import { Alert } from "react-native";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRoute, useNavigation } from "@react-navigation/native";
@@ -24,12 +24,14 @@ import { playerRemoveByGroup } from "@storage/player/playerRemoveByGroup";
 import { groupRemoveByName } from "@storage/group/groupRemoveByName";
 
 import { AppError } from "@utils/AppError";
+import { Loading } from "@components/Loading";
 
 type RouteParams = {
   group: string;
 };
 
 export function Players() {
+  const [isLoading, setIsLoading] = useState(true);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [team, setTeam] = useState("Time A");
   const [players, setPlayers] = useState<PlayerStorageDTO[]>([]);
@@ -67,11 +69,14 @@ export function Players() {
 
   async function featchPlayersByTeam() {
     try {
+      setIsLoading(true);
       const playersByTeam = await playersGetByGroupAndTeam(group, team);
       setPlayers(playersByTeam);
     } catch (error) {
       console.error(error);
       Alert.alert("People", "Could not render the people filtered list");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -139,6 +144,29 @@ export function Players() {
         <NumberOfPlayers>{players.length}</NumberOfPlayers>
       </HeaderList>
 
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={players}
+          keyExtractor={(item) => item.name}
+          renderItem={({ item }) => (
+            <PlayerCard
+              name={item.name}
+              onRemove={() => handleRemovePlayer(item.name)}
+            />
+          )}
+          ListEmptyComponent={() => (
+            <ListEmpty message="Não há pessoas nesse time." />
+          )}
+          contentContainerStyle={[
+            { paddingBottom: 100 },
+            players.length === 0 && { flex: 1 },
+          ]}
+        />
+      )}
+
       <FlatList
         showsVerticalScrollIndicator={false}
         data={players}
@@ -158,7 +186,11 @@ export function Players() {
         ]}
       />
 
-      <Button title="Remover Turma" type="SECONDARY" onPress={groupRemove} />
+      <Button
+        title="Remover Turma"
+        type="SECONDARY"
+        onPress={handleGroupRemove}
+      />
     </Container>
   );
 }
